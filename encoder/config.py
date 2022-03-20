@@ -13,9 +13,9 @@ librispeech_datasets = {
     },
 }
 
-eng_datasets = {
+ser_datasets = {
     "train": {
-        "iemocap": ["IEMOCAP"]
+        "ser": ["IEMOCAP", "EMODB", "SHEMO"],
     }
 }
 libritts_datasets = {

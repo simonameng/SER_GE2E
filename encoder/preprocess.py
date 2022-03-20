@@ -8,7 +8,7 @@ import numpy as np
 from tqdm import tqdm
 
 from encoder import audio
-from encoder.config import librispeech_datasets, anglophone_nationalites, eng_datasets
+from encoder.config import librispeech_datasets, anglophone_nationalites, ser_datasets
 from encoder.params_data import *
 
 import ipdb
@@ -141,11 +141,15 @@ def _preprocess_speaker_dirs(speaker_dirs, dataset_name, datasets_root, out_dir,
 
 def preprocess_librispeech(datasets_root: Path, out_dir: Path, skip_existing=False):
     # for dataset_name in librispeech_datasets["train"]["other"]:
-    for dataset_name in eng_datasets["train"]["iemocap"]:
+    count_db = 0
+    for dataset_name in ser_datasets["train"]["ser"]:
+        count_db += 1
         # Initialize the preprocessing
         dataset_root, logger = _init_preprocess_dataset(dataset_name, datasets_root, out_dir)
         if not dataset_root:
-            return
+            if count_db == 3:
+                return
+            continue
 
         # Preprocess all speakers
         # ipdb.set_trace()
