@@ -25,6 +25,12 @@ if __name__ == '__main__':
         "If True, audio won't be played.")
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
+    parser.add_argument("-s", "--source_audio_path", type=Path,
+                        default="audio",
+                        help="Path to the source audio folder")
+    parser.add_argument("-d", "--dest_emb_path", type=Path,
+                        default="embed",
+                        help="Path to the destination embedding folder")
     args = parser.parse_args()
     arg_dict = vars(args)
     print_args(args, parser)
@@ -74,17 +80,23 @@ if __name__ == '__main__':
     # preprocessed_wav = encoder.preprocess_wav(in_fpath)
     # embed = encoder.embed_utterance(preprocessed_wav)
     # print("Embedding Content:\n", embed)
+    source_dir = arg_dict.pop("source_audio_path")
+    dest_dir = arg_dict.pop("dest_emb_path")
 
+    if not(os.path.exists(dest_dir)):
+                    os.makedirs(dest_dir)
 
-    for root, dirs, files in os.walk("./audio"):
-        for file in files:
-            if file.endswith(".wav"):
-                wavpath = os.path.join(root, file)
-                preprocessed_wav = encoder.preprocess_wav(wavpath)
-                embed = encoder.embed_utterance(preprocessed_wav)
-
-                new_dir = root.replace("/audio/", "/embed/")
-                npypath = os.path.join(new_dir, file.replace(".wav", ".npy"))
-                if not(os.path.exists(new_dir)):
-                    os.makedirs(new_dir)
-                np.save(npypath, embed)
+    for root, dirs, files in os.walk(source_dir):
+        for D in dirs:
+            src_path = os.path.join(source_dir, D, "wav")
+            for r, d, f in os.walk(src_path):
+                for file in f:
+                    if file.endswith(".wav"):
+                        wavpath = os.path.join(r, file)
+                        preprocessed_wav = encoder.preprocess_wav(wavpath)
+                        embed = encoder.embed_utterance(preprocessed_wav)
+                        dest_emo_dir = os.path.join(dest_dir, D)
+                        if not(os.path.exists(dest_emo_dir)):
+                            os.makedirs(dest_emo_dir)
+                        npypath = os.path.join(dest_emo_dir, file.replace(".wav", ".npy"))
+                        np.save(npypath, embed)
